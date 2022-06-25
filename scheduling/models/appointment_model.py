@@ -1,15 +1,17 @@
 from django.db import models
 
-from accounting.models.specialization_model import Specialization
+from accounting.models.user_model import CustomUser
+from .procedure_model import Procedure
 
 # Create your models here.
 
 
-class Procedure(models.Model):
+class Appointment(models.Model):
     name = models.CharField(max_length=20)
-    # duration = models.PositiveIntegerField(help_text='duration of procedure in minutes')
-    duration = models.DurationField(help_text='duration of the procedure')
-    spec = models.ForeignKey(Specialization, on_delete=models.CASCADE, related_name='procedures')
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='appointments')
+    specialist = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='all_appointments')
+    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE)
+    start_datetime = models.DateTimeField(editable=False)
 
     def __str__(self):
         """

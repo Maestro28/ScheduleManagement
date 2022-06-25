@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import validate_email
 
 
-from auth.managers import CustomUserManager
+from accounting.managers import CustomUserManager
 from .specialization_model import Specialization
 
 # Create your models here.
@@ -29,7 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True, validators=[validate_email])
     password = models.CharField(max_length=30)
     # spec = models.ForeignKey(Specialization, on_delete=models.CASCADE, related_name='users')
-    specs = models.ManyToManyField(Specialization, related_name='users')
+    specs = models.ManyToManyField(Specialization, related_name='users', blank=True, null=True)
     role = models.IntegerField(default=0, choices=ROLE_CHOICES)
     is_active = models.BooleanField(default=False)
 

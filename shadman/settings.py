@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'auth'
-    'scheduling'
+    'accounting',
+    'scheduling',
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -102,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounting.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
