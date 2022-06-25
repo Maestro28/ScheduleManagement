@@ -42,10 +42,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         """
-        Magic method is redefined to show all information about CustomUser.
-        :return: user id, user first_name, user middle_name, user last_name,
-                 user email, user password, user updated_at, user created_at,
-                 user role, user is_active
+        Magic method is redefined to show information about CustomUser.
+        :return: user email
         """
         return str(self.email)
 

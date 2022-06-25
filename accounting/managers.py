@@ -1,11 +1,20 @@
 from django.contrib.auth.base_user import BaseUserManager
 
+from .models.user_model import CustomUser
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, specs,
-                    password=None, role=0, is_active=True):
+                    password=None, role=0, is_active=True) -> CustomUser:
         """
         Creates and saves a User with the given email and password.
+        :param: email post address of user
+        :param: first_name user fist name
+        :param: last_name user last name
+        :param: specs user specializations
+        :param: password user password
+        :param: role user role
+        :param: is_active user active status
         """
         if not email:
             raise ValueError('Users must have an email address')
