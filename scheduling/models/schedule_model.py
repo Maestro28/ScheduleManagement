@@ -15,14 +15,14 @@ class Schedule(models.Model):
 
     def __str__(self):
         """
-        Magic method is redefined to show all information about Book.
-        :return: book id, book name, book description, book count, book authors
+        Magic method is redefined to show information about Schedule.
+        :return: schedule start time, schedule end time
         """
-        return str(self.id)
+        return f'start={str(self.start_datetime)}, end={str(self.end_datetime)}'
 
     def __repr__(self):
         """
-        This magic method is redefined to show class and id of Book object.
+        This magic method is redefined to show class and id of Schedule object.
         :return: class, id
         """
         return f'{self.__class__.__name__}(id={self.id})'
