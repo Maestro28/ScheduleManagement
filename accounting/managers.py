@@ -1,11 +1,11 @@
 from django.contrib.auth.base_user import BaseUserManager
 
-from .models.user_model import CustomUser
+# from .models.user_model import CustomUser
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, first_name, last_name, specs,
-                    password=None, role=0, is_active=True) -> CustomUser:
+    def create_user(self, email,  # first_name, last_name, phone,
+                    password=None, role=0, is_active=True, **kwargs):  # -> CustomUser:
         """
         Creates and saves a User with the given email and password.
         :param: email post address of user
@@ -19,25 +19,40 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
-        user = self.model(
-            email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name,
-            specs=specs,
-            role=role,
-            is_active=is_active
-        )
+        user = self.model(email=self.normalize_email(email), **kwargs)
+        if kwargs.get('first_name'):
+            first_name = kwargs.pop('first_name')
+            user.first_name = first_name
+        if kwargs.get('last_name'):
+            last_name = kwargs.pop('last_name')
+            user.last_name = last_name
+        if kwargs.get('phone'):
+            phone = kwargs.pop('phone')
+            user.phone = phone
 
         user.set_password(password)
         user.save(using=self._db)
+        # for s in specs:
+        #     user.specs.add(s)
+        # user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, first_name, last_name, password=None):
+    def create_superuser(self, email, password, **kwargs):
         """
         Creates and saves a superuser with the given email and password.
         """
-        user = self.create_user(email, first_name,
-                                last_name, password)
+        user = self.create_user(email, password, **kwargs)
+
+        if kwargs.get('first_name'):
+            first_name = kwargs.pop('first_name')
+            user.first_name = first_name
+        if kwargs.get('last_name'):
+            last_name = kwargs.pop('last_name')
+            user.last_name = last_name
+        if kwargs.get('phone'):
+            phone = kwargs.pop('phone')
+            user.phone = phone
+
         user.role = 1
         user.is_superuser = True
         user.is_active = True

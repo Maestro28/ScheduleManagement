@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.validators import validate_email
-
+from phone_field import PhoneField
 
 from accounting.managers import CustomUserManager
 from .specialization_model import Specialization
@@ -23,18 +23,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
         This class represents a basic user.
     """
-
+    email = models.EmailField(max_length=100, unique=True, validators=[validate_email])
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
-    email = models.EmailField(max_length=100, unique=True, validators=[validate_email])
-    password = models.CharField(max_length=30)
-    # spec = models.ForeignKey(Specialization, on_delete=models.CASCADE, related_name='users')
-    specs = models.ManyToManyField(Specialization, related_name='users', blank=True, null=True)
+    phone = models.CharField(max_length=16, unique=True)
+    password = models.CharField(max_length=128)
+    specs = models.ManyToManyField(Specialization, related_name='users', blank=True)
     role = models.IntegerField(default=0, choices=ROLE_CHOICES)
     is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'password', 'role']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone']
 
     objects = CustomUserManager()
 
