@@ -31,6 +31,10 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('phone'):
             phone = kwargs.pop('phone')
             user.phone = phone
+        if kwargs.get('role', 0):
+            role = kwargs.pop('role')
+            user.role = role
+
         if kwargs.get('spec') and kwargs.get('role') == 2:
             specs = kwargs.pop('spec')
             for spec in specs:
@@ -38,6 +42,7 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('password'):
             password = kwargs.pop('password')
             user.set_password(password)
+            user.is_active = True
         user.save(using=self._db)
         # for s in specs:
         #     user.specs.add(s)

@@ -11,11 +11,11 @@ app_name = 'accounting'
 urlpatterns = [
     # path('', include(router.urls)),
 
-    path('user/create/', UserCreateList.as_view(), name='spec_create'),
-    path('user/<int:pk>/', UserDetail.as_view(), name='spec_create'),
+    path('user/create/', UserCreateList.as_view(), name='user_create'),
+    path('user/<int:pk>/', UserDetail.as_view(), name='user_detail'),
 
     path('spec/create/', SpecializationCreateList.as_view(), name='spec_create'),
-    path('spec/<int:pk>/', SpecializationDetail.as_view()),
+    path('spec/<int:pk>/', SpecializationDetail.as_view(), name='spec_detail'),
 
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
