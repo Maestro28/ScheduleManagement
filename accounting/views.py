@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,6 +10,7 @@ from django.http import Http404
 from .serializers import UserSerializer, SpecializationSerializer
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
+from .managers import CustomUserManager
 
 # Create your views here.
 
@@ -26,7 +27,8 @@ class UserCreateList(APIView):
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            # serializer.save()
+            serializer.create()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,6 +66,8 @@ class SpecializationCreateList(APIView):
     """
     List all specializations, or create a new Specialization.
     """
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request, format=None):
         spec = Specialization.objects.all()
         serializer = SpecializationSerializer(spec, many=True)
@@ -72,7 +76,9 @@ class SpecializationCreateList(APIView):
     def post(self, request, format=None):
         serializer = SpecializationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            users = serializer.validated_data.get('users')
+            users.append(request.user)
+            serializer.save(users=users)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -81,6 +87,8 @@ class SpecializationDetail(APIView):
     """
     Retrieve, update or delete a Specialization instance.
     """
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Specialization.objects.get(pk=pk)

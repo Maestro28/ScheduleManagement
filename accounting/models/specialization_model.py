@@ -5,8 +5,10 @@ from django.db import models
 
 
 class Specialization(models.Model):
-    # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='orders')
-    name = models.CharField(max_length=20)
+    """
+        This class represents a user Specializations.
+    """
+    name = models.CharField(max_length=20, unique=True)
 
 
     def __str__(self):
