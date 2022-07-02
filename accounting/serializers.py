@@ -14,9 +14,14 @@ class UserSerializer(serializers.ModelSerializer):
     # appointments = serializers.PrimaryKeyRelatedField(many=True, queryset=Appointment.objects.all())
     # all_appointments = serializers.PrimaryKeyRelatedField(many=True, queryset=Appointment.objects.all())
     # schedules = serializers.PrimaryKeyRelatedField(many=True, queryset=Schedule.objects.all())
+    specs = serializers.SlugRelatedField(many=True,
+                                         queryset=[],
+                                         slug_field='name',
+                                         allow_null=True,
+                                         required=False,
+                                         # read_only=True
+                                         )
 
-    # def save(self):
-    #     user.createuser user from django aut
     def create(self, validated_data):
         user = CustomUser.objects.create_user(**validated_data)
         user.save()
@@ -35,10 +40,10 @@ class SpecializationSerializer(serializers.HyperlinkedModelSerializer):
     """
     # users = serializers.PrimaryKeyRelatedField(many=True, queryset=CustomUser.objects.all())
     # users = serializers.SlugRelatedField(many=True, read_only=True, slug_field='first_name')
-    users = serializers.HyperlinkedIdentityField(view_name='accounting:user_detail',
+    users = serializers.HyperlinkedIdentityField(view_name='accounting:user_detail_mail',
                                                  many=True,
                                                  read_only=True,
-                                                 lookup_field='pk')
+                                                 lookup_field='email')
 
     class Meta:
         model = Specialization

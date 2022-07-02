@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 from .serializers import UserSerializer, SpecializationSerializer
 from .models.specialization_model import Specialization
@@ -60,6 +61,15 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserByMailDetail(UserDetail):
+
+    def get(self, request, email, format=None):
+        # user = self.get_object(pk=2)
+        user = get_object_or_404(CustomUser, email=email)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 
 class SpecializationCreateList(APIView):

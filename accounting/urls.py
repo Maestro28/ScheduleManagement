@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework import routers
 
-from .views import UserDetail, UserCreateList, SpecializationCreateList, SpecializationDetail
+from .views import UserDetail, UserByMailDetail, UserCreateList, SpecializationCreateList, SpecializationDetail
 
 # router = routers.DefaultRouter()
 # router.register(r'/spec/create/', SpecializationCreateList)
@@ -13,6 +13,7 @@ urlpatterns = [
 
     path('user/create/', UserCreateList.as_view(), name='user_create'),
     path('user/<int:pk>/', UserDetail.as_view(), name='user_detail'),
+    path('user/<str:email>/', UserByMailDetail.as_view(), name='user_detail_mail'),
 
     path('spec/create/', SpecializationCreateList.as_view(), name='spec_create'),
     path('spec/<int:pk>/', SpecializationDetail.as_view(), name='spec_detail'),
