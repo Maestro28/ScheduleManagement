@@ -112,7 +112,10 @@ class SpecializationDetail(APIView):
 
     def get(self, request, pk, format=None):
         spec = self.get_object(pk)
-        serializer = SpecializationSerializer(spec)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = SpecializationSerializer(spec, context=serializer_context)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
@@ -128,20 +131,16 @@ class SpecializationDetail(APIView):
         spec.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class Specialists(APIView):
+class Specialists(SpecializationDetail):
     """
     Retrieve, update or delete a Specialization instance.
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get_object(self, pk):
-        try:
-            return Specialization.objects.get(pk=pk)
-        except Specialization.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        spec = self.get_object(pk)
-        serializer = SpecializationSerializer(spec)
+    def get(self, request, name, format=None):
+        spec = get_object_or_404(Specialization, name=name)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = SpecializationSerializer(spec, context=serializer_context)
         return Response(serializer.data)
 

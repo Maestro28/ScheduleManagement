@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework import routers
 
-from .views import UserDetail, UserByMailDetail, UserCreateList, SpecializationCreateList, SpecializationDetail
+from .views import UserDetail, UserByMailDetail, UserCreateList, SpecializationCreateList, \
+    SpecializationDetail, Specialists
 
 # router = routers.DefaultRouter()
 # router.register(r'/spec/create/', SpecializationCreateList)
@@ -17,7 +18,7 @@ urlpatterns = [
 
     path('spec/create/', SpecializationCreateList.as_view(), name='spec_create'),
     path('spec/<int:pk>/', SpecializationDetail.as_view(), name='spec_detail'),
-    path('spec/<str:name>/', SpecializationDetail.as_view(), name='spec_users'),
+    path('spec/<str:name>/', Specialists.as_view(), name='spec_users'),
 
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
