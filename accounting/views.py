@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from .serializers import UserSerializer, SpecializationSerializer
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
-from .managers import CustomUserManager
+from .permissions import IsAdmOrIsOwnerOrReadOnly
 
 # Create your views here.
 
@@ -20,6 +20,7 @@ class UserCreateList(APIView):
     """
     List all users, or create a new User.
     """
+    # permission_classes = [AllowAny]
     def get(self, request, format=None):
         user = CustomUser.objects.all()
         serializer = UserSerializer(user, many=True)
@@ -38,6 +39,7 @@ class UserDetail(APIView):
     """
     Retrieve, update or delete a User instance.
     """
+    # permission_classes = [IsAdmOrIsOwnerOrReadOnly]
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -76,7 +78,7 @@ class SpecializationCreateList(APIView):
     """
     List all specializations, or create a new Specialization.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, format=None):
         spec = Specialization.objects.all()
@@ -100,7 +102,7 @@ class SpecializationDetail(APIView):
     """
     Retrieve, update or delete a Specialization instance.
     """
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -126,4 +128,20 @@ class SpecializationDetail(APIView):
         spec.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class Specialists(APIView):
+    """
+    Retrieve, update or delete a Specialization instance.
+    """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Specialization.objects.get(pk=pk)
+        except Specialization.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        spec = self.get_object(pk)
+        serializer = SpecializationSerializer(spec)
+        return Response(serializer.data)
 

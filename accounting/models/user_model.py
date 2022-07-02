@@ -40,6 +40,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     ordering = ('email',)
 
+    @property
+    def is_staff(self):
+        """Is the user a member of staff?"""
+        # Simplest possible answer: All admins are staff
+        if self.role == 1:
+            return True
+        return False
+
     def __str__(self):
         """
         Magic method is redefined to show information about CustomUser.

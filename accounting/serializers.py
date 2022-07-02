@@ -14,15 +14,16 @@ class UserSerializer(serializers.ModelSerializer):
     # appointments = serializers.PrimaryKeyRelatedField(many=True, queryset=Appointment.objects.all())
     # all_appointments = serializers.PrimaryKeyRelatedField(many=True, queryset=Appointment.objects.all())
     # schedules = serializers.PrimaryKeyRelatedField(many=True, queryset=Schedule.objects.all())
-    specs = serializers.SlugRelatedField(many=True,
-                                         queryset=[],
+    specs = serializers.SlugRelatedField(many=True,  # U should comment than field to work with id instead names
+                                         queryset=Specialization.objects.all(),
                                          slug_field='name',
                                          allow_null=True,
                                          required=False,
-                                         # read_only=True
+                                         read_only=False
                                          )
 
     def create(self, validated_data):
+        print(f'validated data==============={validated_data}')
         user = CustomUser.objects.create_user(**validated_data)
         user.save()
 
@@ -47,7 +48,7 @@ class SpecializationSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Specialization
-        fields = ['name', 'users']
+        fields = ['id', 'name', 'users']
 
 
 

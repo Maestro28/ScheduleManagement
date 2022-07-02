@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 .idea
 /temp
+temp
+
 
 __pycache__/
 *.py[cod]

@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('spec/create/', SpecializationCreateList.as_view(), name='spec_create'),
     path('spec/<int:pk>/', SpecializationDetail.as_view(), name='spec_detail'),
+    path('spec/<str:name>/', SpecializationDetail.as_view(), name='spec_users'),
 
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),

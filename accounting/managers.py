@@ -34,19 +34,19 @@ class CustomUserManager(BaseUserManager):
         if kwargs.get('role', 0):
             role = kwargs.pop('role')
             user.role = role
-
-        if kwargs.get('spec') and kwargs.get('role') == 2:
-            specs = kwargs.pop('spec')
-            for spec in specs:
-                user.specs.add(spec)
         if kwargs.get('password'):
             password = kwargs.pop('password')
             user.set_password(password)
             user.is_active = True
         user.save(using=self._db)
-        # for s in specs:
-        #     user.specs.add(s)
-        # user.save(using=self._db)
+        print('\n\n----------------here1------------------------\n\n')
+        # print(kwargs.get('spec'))
+        print(user.role)
+        if kwargs.get('specs') and user.role == 2:
+            print('\n\n----------------here------------------------\n\n')
+            specs = kwargs.pop('specs')
+            for spec in specs:
+                user.specs.add(spec)
         return user
 
     def create_superuser(self, **kwargs):
