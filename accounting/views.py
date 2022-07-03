@@ -135,7 +135,7 @@ class SpecializationDetail(APIView):
 
 class Specialists(SpecializationDetail):
     """
-    Retrieve, update or delete a Specialization instance.
+    Show specialists links.
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, name, format=None):
@@ -149,9 +149,8 @@ class Specialists(SpecializationDetail):
 
 class SpecialistsInfo(APIView):
     """
-    Retrieve, update or delete a Specialization instance.
+    Show information about specialization and specialists contacts.
     """
-
     def get_object(self, pk):
         try:
             return Specialization.objects.get(pk=pk)

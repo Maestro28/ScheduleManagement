@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
@@ -30,7 +29,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'password', 'specs', 'role']
         extra_kwargs = {'password': {'write_only': True}}
-        # write_only_fields = ['password']
         read_only_fields = ['appointments', 'all_appointments', 'schedules']
 
 
