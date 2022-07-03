@@ -39,11 +39,7 @@ class CustomUserManager(BaseUserManager):
             user.set_password(password)
             user.is_active = True
         user.save(using=self._db)
-        print('\n\n----------------here1------------------------\n\n')
-        # print(kwargs.get('spec'))
-        print(user.role)
         if kwargs.get('specs') and user.role == 2:
-            print('\n\n----------------here------------------------\n\n')
             specs = kwargs.pop('specs')
             for spec in specs:
                 user.specs.add(spec)

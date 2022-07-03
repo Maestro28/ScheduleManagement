@@ -7,8 +7,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from rest_framework.renderers import JSONRenderer
 
-from .serializers import UserSerializer, SpecializationSerializer
+from .serializers import UserSerializer, SpecializationSerializer, UserListBySpec
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
 from .permissions import IsAdmOrIsOwnerOrReadOnly
@@ -131,6 +132,7 @@ class SpecializationDetail(APIView):
         spec.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class Specialists(SpecializationDetail):
     """
     Retrieve, update or delete a Specialization instance.
@@ -143,4 +145,27 @@ class Specialists(SpecializationDetail):
         }
         serializer = SpecializationSerializer(spec, context=serializer_context)
         return Response(serializer.data)
+
+
+class SpecialistsInfo(APIView):
+    """
+    Retrieve, update or delete a Specialization instance.
+    """
+
+    def get_object(self, pk):
+        try:
+            return Specialization.objects.get(pk=pk)
+        except Specialization.DoesNotExist:
+            raise Http404
+
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    def get(self, request, format=None):
+        spec = self.get_object(request.query_params.get('spec_id'))
+        users = []
+        for user in spec.users.all():
+            users.append(user.id)
+        data = dict(id=spec.id, name=spec.name, users=users)
+        serializer = UserListBySpec(data=data)
+        serializer.is_valid()
+        return Response(serializer.validated_data)
 

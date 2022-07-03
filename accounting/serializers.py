@@ -23,7 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
                                          )
 
     def create(self, validated_data):
-        print(f'validated data==============={validated_data}')
         user = CustomUser.objects.create_user(**validated_data)
         user.save()
 
@@ -39,8 +38,6 @@ class SpecializationSerializer(serializers.HyperlinkedModelSerializer):
     """
         This class represents a serializer which designed for Specialization objects serialization/deserialization.
     """
-    # users = serializers.PrimaryKeyRelatedField(many=True, queryset=CustomUser.objects.all())
-    # users = serializers.SlugRelatedField(many=True, read_only=True, slug_field='first_name')
     users = serializers.HyperlinkedIdentityField(view_name='accounting:user_detail_mail',
                                                  many=True,
                                                  read_only=True,
@@ -50,6 +47,36 @@ class SpecializationSerializer(serializers.HyperlinkedModelSerializer):
         model = Specialization
         fields = ['id', 'name', 'users']
 
+
+class UserListBySpec(serializers.Serializer):
+    """
+        This class represents a serializer which designed for show all specialists on that specialization.
+    """
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=20)
+    users = serializers.ListField(
+        child=serializers.IntegerField()
+    )
+
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        users = []
+        for user_id in data['users']:
+            user = CustomUser.objects.get(pk=user_id)
+            d = {}
+            d['id'] = user_id
+            d['email'] = user.email
+            d['first name'] = user.first_name
+            d['last name'] = user.last_name
+            d['phone'] = user.phone
+            users.append(d)
+        data['users'] = users
+        return data
+
+    class Meta:
+        fields = ['id', 'name', 'users']
 
 
 
