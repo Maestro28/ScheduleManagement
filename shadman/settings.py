@@ -128,6 +128,8 @@ LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 
+# DATETIME_FORMAT = '%Y-%m-%d %H:%M'
+
 USE_I18N = True
 
 USE_TZ = True

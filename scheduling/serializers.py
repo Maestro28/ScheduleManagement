@@ -20,12 +20,8 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     """
-        This class represents a serializer which designed for Schedule objects serialization/deserialization.
+        This class represents a serializer which designed for Location objects serialization/deserialization.
     """
-
-    # def create(self, validated_data):
-    #     user = CustomUser.objects.create_user(**validated_data)
-    #     user.save()
 
     class Meta:
         model = Location
