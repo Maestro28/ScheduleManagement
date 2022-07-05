@@ -3,7 +3,7 @@ from rest_framework_simplejwt import views as jwt_views
 from rest_framework import routers
 
 from .views import ScheduleCreateList, ScheduleDetail, LocationCreateList, LocationDetail, ProcedureCreateList, \
-    ProcedureDetail
+    ProcedureDetail, AppointmentCreateList, AppointmentDetail
 
 # router = routers.DefaultRouter()
 # router.register(r'/spec/create/', SpecializationCreateList)
@@ -20,5 +20,8 @@ urlpatterns = [
 
     path('procedure/create/', ProcedureCreateList.as_view(), name='procedure_create'),
     path('procedure/<int:pk>/', ProcedureDetail.as_view(), name='procedure_detail'),
+
+    path('appointment/create/', AppointmentCreateList.as_view(), name='appointment_create'),
+    path('appointment/<int:pk>/', AppointmentDetail.as_view(), name='appointment_detail'),
 
 ]

@@ -66,7 +66,6 @@ class ProcedureSerializer(serializers.ModelSerializer):
     """
         This class represents a serializer which designed for Procedure objects serialization/deserialization.
     """
-    # spec = serializers.PrimaryKeyRelatedField(queryset=Spe)
     duration = serializers.DurationField(max_value=timedelta(hours=5),
                                          min_value=timedelta(minutes=30),
                                          )
@@ -74,3 +73,28 @@ class ProcedureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Procedure
         fields = ['id', 'name', 'duration', 'spec']
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    """
+        This class represents a serializer which designed for Appointment objects serialization/deserialization.
+    """
+    start_datetime = serializers.DateTimeField(
+        required=True, allow_null=True,
+        format="%d-%m-%Y %H:%M",
+        input_formats=["%Y-%m-%d %H:%M", "%d-%m-%Y %H:%M"]
+    )
+
+    def validate(self, data):
+
+        if data['start_datetime'] < timezone.now():
+            raise serializers.ValidationError("It is already too late")
+
+        # it should be really good validation here
+
+        return data
+
+
+    class Meta:
+        model = Appointment
+        fields = ['id', 'name', 'customer', 'specialist', 'procedure', 'start_datetime']

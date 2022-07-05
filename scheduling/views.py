@@ -8,7 +8,7 @@ from .models.location_model import Location
 from .models.procedure_model import Procedure
 from .models.appointment_model import Appointment
 
-from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer
+from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer, AppointmentSerializer
 
 # Create your views here.
 
@@ -137,7 +137,7 @@ class ProcedureCreateList(APIView):
 
 class ProcedureDetail(APIView):
     """
-    Retrieve, update or delete a Location instance.
+    Retrieve, update or delete a Procedure instance.
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -166,4 +166,56 @@ class ProcedureDetail(APIView):
     def delete(self, request, pk, format=None):
         procedure = self.get_object(pk)
         procedure.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AppointmentCreateList(APIView):
+    """
+    List all locations, or create a new Appointment.
+    """
+    # permission_classes = [AllowAny]
+    def get(self, request, format=None):
+        appointment = Appointment.objects.all()
+        serializer = AppointmentSerializer(appointment, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = AppointmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppointmentDetail(APIView):
+    """
+    Retrieve, update or delete a Procedure instance.
+    """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Appointment.objects.get(pk=pk)
+        except Appointment.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        appointment = self.get_object(pk)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = AppointmentSerializer(appointment, context=serializer_context)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        appointment = self.get_object(pk)
+        serializer = AppointmentSerializer(appointment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        appointment = self.get_object(pk)
+        appointment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
