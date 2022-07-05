@@ -7,30 +7,23 @@ from accounting.managers import CustomUserManager
 from .specialization_model import Specialization
 from accounting.validators import validate_phone_number
 
-# Create your models here.
-
-
-
-# Create your models here.
-
-ROLE_CHOICES = ( # change tu Enum
-    (0, 'visitor'),
-    (1, 'admin'),
-    (2, 'worker'),
-)
-
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
         This class represents a basic user.
     """
+    class UserRole(models.IntegerChoices):
+        VISITOR = 0
+        ADMIN = 1
+        WORKER = 2
+
     email = models.EmailField(max_length=100, unique=True, validators=[validate_email])
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     phone = models.CharField(max_length=16, unique=True, validators=[validate_phone_number])
     password = models.CharField(max_length=128)
     specs = models.ManyToManyField(Specialization, related_name='users', blank=True)
-    role = models.IntegerField(default=0, choices=ROLE_CHOICES)
+    role = models.IntegerField(default=0, choices=UserRole.choices)
     is_active = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
