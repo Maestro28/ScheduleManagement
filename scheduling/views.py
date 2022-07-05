@@ -1,12 +1,14 @@
-from datetime import datetime, timedelta
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 
-from .models.schedule_model import Schedule, Location
-from .serializers import ScheduleSerializer, LocationSerializer
+from .models.schedule_model import Schedule
+from .models.location_model import Location
+from .models.procedure_model import Procedure
+from .models.appointment_model import Appointment
+
+from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer
 
 # Create your views here.
 
@@ -24,9 +26,6 @@ class ScheduleCreateList(APIView):
     def post(self, request, format=None):
         serializer = ScheduleSerializer(data=request.data)
         if serializer.is_valid():
-            # print(f'\n\n\nvalidated data ===================== {serializer.validated_data}\n\n\n')
-            # serializer.validated_data['start_datetime']=datetime.now()
-            # serializer.validated_data['end_datetime']=datetime.now()+timedelta(hours=6)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -86,7 +85,7 @@ class LocationCreateList(APIView):
 
 class LocationDetail(APIView):
     """
-    Retrieve, update or delete a Specialization instance.
+    Retrieve, update or delete a Location instance.
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
 
@@ -115,4 +114,56 @@ class LocationDetail(APIView):
     def delete(self, request, pk, format=None):
         location = self.get_object(pk)
         location.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProcedureCreateList(APIView):
+    """
+    List all locations, or create a new Procedure.
+    """
+    # permission_classes = [AllowAny]
+    def get(self, request, format=None):
+        procedure = Procedure.objects.all()
+        serializer = ProcedureSerializer(procedure, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ProcedureSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProcedureDetail(APIView):
+    """
+    Retrieve, update or delete a Location instance.
+    """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Procedure.objects.get(pk=pk)
+        except Procedure.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        procedure = self.get_object(pk)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = ProcedureSerializer(procedure, context=serializer_context)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        procedure = self.get_object(pk)
+        serializer = ProcedureSerializer(procedure, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        procedure = self.get_object(pk)
+        procedure.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

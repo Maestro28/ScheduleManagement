@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework import routers
 
-from .views import ScheduleCreateList, ScheduleDetail, LocationCreateList, LocationDetail
+from .views import ScheduleCreateList, ScheduleDetail, LocationCreateList, LocationDetail, ProcedureCreateList, \
+    ProcedureDetail
 
 # router = routers.DefaultRouter()
 # router.register(r'/spec/create/', SpecializationCreateList)
@@ -16,5 +17,8 @@ urlpatterns = [
 
     path('location/create/', LocationCreateList.as_view(), name='location_create'),
     path('location/<int:pk>/', LocationDetail.as_view(), name='location_detail'),
+
+    path('procedure/create/', ProcedureCreateList.as_view(), name='procedure_create'),
+    path('procedure/<int:pk>/', ProcedureDetail.as_view(), name='procedure_detail'),
 
 ]

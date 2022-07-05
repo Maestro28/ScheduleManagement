@@ -1,9 +1,13 @@
+from datetime import timedelta
+
 from django.utils import timezone
 
 from rest_framework import serializers
 
 from .models.schedule_model import Schedule
 from .models.location_model import Location
+from .models.procedure_model import Procedure
+from .models.appointment_model import Appointment
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -56,3 +60,17 @@ class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ['id', 'name']
+
+
+class ProcedureSerializer(serializers.ModelSerializer):
+    """
+        This class represents a serializer which designed for Procedure objects serialization/deserialization.
+    """
+    # spec = serializers.PrimaryKeyRelatedField(queryset=Spe)
+    duration = serializers.DurationField(max_value=timedelta(hours=5),
+                                         min_value=timedelta(minutes=30),
+                                         )
+
+    class Meta:
+        model = Procedure
+        fields = ['id', 'name', 'duration', 'spec']
