@@ -8,6 +8,7 @@ from .models.schedule_model import Schedule
 from .models.location_model import Location
 from .models.procedure_model import Procedure
 from .models.appointment_model import Appointment
+from .utils import free_time_intervals
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -87,12 +88,18 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
 
+        print(f'data==={data["start_datetime"]}')
+        print(free_time_intervals(data['start_datetime'], data['specialist']))
+
         if data['start_datetime'] < timezone.now():
             raise serializers.ValidationError("It is already too late")
 
         # it should be really good validation here
-
-        return data
+        for interval in free_time_intervals(data['start_datetime'], data['specialist']):
+            if interval[0] < data['start_datetime'] < interval[1]:
+                if interval[0] < data['start_datetime']+data['procedure'].duration < interval[1]:
+                    return data
+        raise serializers.ValidationError("This specialist already beasy in that time")
 
 
     class Meta:
