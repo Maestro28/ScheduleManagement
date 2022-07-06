@@ -1,20 +1,14 @@
 from datetime import datetime
 
-# from django.shortcuts import get_object_or_404
-
-from shadman import settings
-# settings.configure()
-
-from accounting.models.user_model import CustomUser
 from scheduling.models.schedule_model import Schedule
 from scheduling.models.appointment_model import Appointment
 
 
-def free_time_intervals(day, user):
+def free_time_intervals(day: datetime, user: int) -> [(datetime, datetime), ...]:
     """
     :param day: direct day
     :param user: direct user
-    :return: list fre time intervals
+    :return: list free time intervals
     """
 
     schedules = Schedule.objects.filter(start_datetime__day=day.day,
