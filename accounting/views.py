@@ -1,18 +1,12 @@
-from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly, IsAdminUser
-from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework.renderers import JSONRenderer
 
 from .serializers import UserSerializer, SpecializationSerializer, UserListBySpec
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
-from .permissions import IsAdmOrIsOwnerOrReadOnly
 
 # Create your views here.
 
@@ -22,12 +16,15 @@ class UserCreateList(APIView):
     List all users, or create a new User.
     """
     # permission_classes = [AllowAny]
+
     def get(self, request, format=None):
         user = CustomUser.objects.all()
         serializer = UserSerializer(user, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        if not request.data.get('specs'):
+            request.data['specs'] = []
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             # serializer.save()
@@ -41,6 +38,7 @@ class UserDetail(APIView):
     Retrieve, update or delete a User instance.
     """
     # permission_classes = [IsAdmOrIsOwnerOrReadOnly]
+
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -138,6 +136,7 @@ class Specialists(SpecializationDetail):
     Show specialists links.
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get(self, request, name, format=None):
         spec = get_object_or_404(Specialization, name=name)
         serializer_context = {
@@ -151,13 +150,14 @@ class SpecialistsInfo(APIView):
     """
     Show information about specialization and specialists contacts.
     """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+
     def get_object(self, pk):
         try:
             return Specialization.objects.get(pk=pk)
         except Specialization.DoesNotExist:
             raise Http404
 
-    # permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         spec = self.get_object(request.query_params.get('spec_id'))
         users = []

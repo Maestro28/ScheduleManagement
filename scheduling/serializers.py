@@ -4,7 +4,6 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
-from accounting.models.user_model import CustomUser
 from .models.schedule_model import Schedule
 from .models.location_model import Location
 from .models.procedure_model import Procedure
@@ -126,7 +125,7 @@ class SpecialistFreeTimeSerializer(serializers.Serializer):
 
     def validate(self, data):
         """
-        Check that start is before finish.
+        Check for the free intervals which specialist have.
         """
         intervals = []
         for interval in free_time_intervals(data['daytime'], data['id']):
