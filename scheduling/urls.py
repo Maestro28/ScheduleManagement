@@ -1,16 +1,10 @@
-from django.urls import path, include
-from rest_framework_simplejwt import views as jwt_views
-from rest_framework import routers
+from django.urls import path, include, re_path
 
 from .views import ScheduleCreateList, ScheduleDetail, LocationCreateList, LocationDetail, ProcedureCreateList, \
-    ProcedureDetail, AppointmentCreateList, AppointmentDetail
-
-# router = routers.DefaultRouter()
-# router.register(r'/spec/create/', SpecializationCreateList)
+    ProcedureDetail, AppointmentCreateList, AppointmentDetail, SpecialistFreeTimeGET
 
 app_name = 'scheduling'
 urlpatterns = [
-    # path('', include(router.urls)),
 
     path('schedule/create/', ScheduleCreateList.as_view(), name='schedule_create'),
     path('schedule/<int:pk>/', ScheduleDetail.as_view(), name='schedule_detail'),
@@ -23,5 +17,7 @@ urlpatterns = [
 
     path('appointment/create/', AppointmentCreateList.as_view(), name='appointment_create'),
     path('appointment/<int:pk>/', AppointmentDetail.as_view(), name='appointment_detail'),
+
+    path('spec_free_time/', SpecialistFreeTimeGET.as_view(), name='free_specialist_time'),
 
 ]

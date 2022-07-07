@@ -3,12 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 
+from accounting.models.user_model import CustomUser
+from .utils import free_time_intervals
 from .models.schedule_model import Schedule
 from .models.location_model import Location
 from .models.procedure_model import Procedure
 from .models.appointment_model import Appointment
 
-from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer, AppointmentSerializer
+from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer, AppointmentSerializer, \
+    SpecialistFreeTimeSerializer
 
 # Create your views here.
 
@@ -219,3 +222,16 @@ class AppointmentDetail(APIView):
         appointment = self.get_object(pk)
         appointment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SpecialistFreeTimeGET(APIView):
+    """
+    Show specialists free time in direct day.
+    """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    def get(self, request, format=None):
+        data = dict(id=request.GET.get('id'), daytime=request.GET.get('daytime'), intervals=[])
+        serializer = SpecialistFreeTimeSerializer(data=data)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

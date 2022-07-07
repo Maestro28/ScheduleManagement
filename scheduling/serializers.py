@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from rest_framework import serializers
 
+from accounting.models.user_model import CustomUser
 from .models.schedule_model import Schedule
 from .models.location_model import Location
 from .models.procedure_model import Procedure
@@ -94,14 +95,48 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if data['start_datetime'] < timezone.now():
             raise serializers.ValidationError("It is already too late")
 
-        # it should be really good validation here
         for interval in free_time_intervals(data['start_datetime'], data['specialist']):
             if interval[0] < data['start_datetime'] < interval[1]:
                 if interval[0] < data['start_datetime']+data['procedure'].duration < interval[1]:
                     return data
         raise serializers.ValidationError("This specialist already beasy in that time")
 
-
     class Meta:
         model = Appointment
         fields = ['id', 'name', 'customer', 'specialist', 'procedure', 'start_datetime']
+
+
+class SpecialistFreeTimeSerializer(serializers.Serializer):
+    """
+        This class represents a serializer which designed for show all specialists on that specialization.
+    """
+    id = serializers.IntegerField()
+    daytime = serializers.DateTimeField(
+        required=True, allow_null=True,
+        format="%d-%m-%Y",
+        input_formats=["%Y-%m-%d", "%d-%m-%Y"]
+    )
+    intervals = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.DateTimeField(
+                format="%d-%m-%Y %H:%M",
+                input_formats=["%Y-%m-%d %H:%M", "%d-%m-%Y %H:%M"])),
+        allow_empty=True
+    )
+
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        intervals = []
+        for interval in free_time_intervals(data['daytime'], data['id']):
+            d = dict()
+            d[f'interval start'] = interval[0]
+            d[f'interval end'] = interval[1]
+            intervals.append(d)
+        data['intervals'] = intervals
+
+        return data
+
+    class Meta:
+        fields = ['id', 'daytime', 'intervals']
