@@ -3,6 +3,10 @@ from datetime import timedelta
 from django.utils import timezone
 
 from rest_framework import serializers
+from django.core import serializers as SSS
+
+from accounting.models.user_model import CustomUser
+from accounting.serializers import UserSerializer
 
 from .models.schedule_model import Schedule
 from .models.location_model import Location
@@ -107,7 +111,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
 class SpecialistFreeTimeSerializer(serializers.Serializer):
     """
-        This class represents a serializer which designed for show all specialists on that specialization.
+        This class represents a serializer which designed for show all free time intervals in direct day.
     """
     id = serializers.IntegerField()
     daytime = serializers.DateTimeField(
@@ -125,7 +129,7 @@ class SpecialistFreeTimeSerializer(serializers.Serializer):
 
     def validate(self, data):
         """
-        Check for the free intervals which specialist have.
+        Check for free intervals which specialist have.
         """
         intervals = []
         for interval in free_time_intervals(data['daytime'], data['id']):
@@ -139,3 +143,40 @@ class SpecialistFreeTimeSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['id', 'daytime', 'intervals']
+
+
+class FreeSpecialistsSerializer(serializers.Serializer):
+    """
+        This class represents a serializer which designed for show all available specialist to perform
+        direct procedure in direct time (then customer can create Appointment).
+    """
+    id = serializers.IntegerField()
+    datetime = serializers.DateTimeField(
+        required=True, allow_null=True,
+        format="%d-%m-%Y %H:%M",
+        input_formats=["%Y-%m-%d %H:%M", "%d-%m-%Y %H:%M"]
+    )
+
+    specialists = UserSerializer(many=True)
+
+    def validate(self, data):
+        """
+        Check for free intervals which specialist have.
+        """
+
+        # I will use selectRelated/prefetch_related instead next few lines to decrease db request amount...
+        procedure = Procedure.objects.get(pk=data['id'])
+        spec = procedure.spec
+        users = CustomUser.objects.filter(specs=spec)
+
+        for user in users:
+            for interval in free_time_intervals(data['datetime'], user.id):
+                if interval[0] < data['datetime'] < interval[1]:
+                    if interval[0] < data['datetime']+procedure.duration < interval[1]:
+                        data['specialists'].append(user)
+                        break
+
+        return data
+
+    class Meta:
+        fields = ['id', 'datetime', 'specialists']

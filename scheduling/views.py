@@ -11,7 +11,7 @@ from .models.procedure_model import Procedure
 from .models.appointment_model import Appointment
 
 from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer, AppointmentSerializer, \
-    SpecialistFreeTimeSerializer
+    SpecialistFreeTimeSerializer, FreeSpecialistsSerializer
 
 # Create your views here.
 
@@ -226,12 +226,27 @@ class AppointmentDetail(APIView):
 
 class SpecialistFreeTimeGET(APIView):
     """
-    Show specialists free time in direct day.
+    Show specialist free time in direct day.
+    example: http://127.0.0.1:8000/api/v1/scheduling/spec_free_time/?daytime=2022-07-06&id=45
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
         data = dict(id=request.GET.get('id'), daytime=request.GET.get('daytime'), intervals=[])
         serializer = SpecialistFreeTimeSerializer(data=data)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FreeSpecialists(APIView):
+    """
+    Show specialist free time in direct day.
+    example: http://127.0.0.1:8000/api/v1/scheduling/spec_free_time/?daytime=2022-07-06&id=45
+    """
+    # permission_classes = [IsAuthenticatedOrReadOnly]
+    def get(self, request, format=None):
+        data = dict(id=request.GET.get('id'), datetime=request.GET.get('datetime'), specialists=[])
+        serializer = FreeSpecialistsSerializer(data=data)
         if serializer.is_valid():
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
