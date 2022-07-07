@@ -240,8 +240,8 @@ class SpecialistFreeTimeGET(APIView):
 
 class FreeSpecialists(APIView):
     """
-    Show specialist free time in direct day.
-    example: http://127.0.0.1:8000/api/v1/scheduling/spec_free_time/?daytime=2022-07-06&id=45
+    Show free specialist in direct datetime.
+    example: http://127.0.0.1:8000/api/v1/scheduling/free_specs/?id=1&datetime=06-07-2022 11:10
     """
     # permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request, format=None):
