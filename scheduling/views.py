@@ -2,11 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser
+
 
 from django.http import Http404
 
 from accounting.models.user_model import CustomUser
-from .utils import free_time_intervals
+from accounting.permissions import IsAdmOrIsOwnerOrReadOnly, SpecialistsOnlyPermission, SpecialistOrAdminPermission
+
 from .models.schedule_model import Schedule
 from .models.location_model import Location
 from .models.procedure_model import Procedure
@@ -22,13 +25,16 @@ class ScheduleCreateList(APIView):
     """
     List all schedules, or create a new Schedule.
     """
-    # permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         schedule = Schedule.objects.all()
         serializer = ScheduleSerializer(schedule, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        if request.user.role == 2:
+            request.data['user'] = request.user.id
         serializer = ScheduleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -40,7 +46,7 @@ class ScheduleDetail(APIView):
     """
     Retrieve, update or delete a Specialization instance.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -74,7 +80,7 @@ class LocationCreateList(APIView):
     """
     List all locations, or create a new Location.
     """
-    # permission_classes = [AllowAny]
+    permission_classes = [SpecialistOrAdminPermission]
     def get(self, request, format=None):
         location = Location.objects.all()
         serializer = LocationSerializer(location, many=True)
@@ -92,7 +98,7 @@ class LocationDetail(APIView):
     """
     Retrieve, update or delete a Location instance.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -126,7 +132,7 @@ class ProcedureCreateList(APIView):
     """
     List all locations, or create a new Procedure.
     """
-    # permission_classes = [AllowAny]
+    permission_classes = [SpecialistOrAdminPermission]
     def get(self, request, format=None):
         procedure = Procedure.objects.all()
         serializer = ProcedureSerializer(procedure, many=True)
@@ -144,7 +150,7 @@ class ProcedureDetail(APIView):
     """
     Retrieve, update or delete a Procedure instance.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -178,13 +184,17 @@ class AppointmentCreateList(APIView):
     """
     List all locations, or create a new Appointment.
     """
-    # permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         appointment = Appointment.objects.all()
         serializer = AppointmentSerializer(appointment, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        if request.user.role == 2:
+            request.data['specialist'] = request.user.id
+        elif request.user.role == 0:
+            request.data['customer'] = request.user.id
         serializer = AppointmentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -196,7 +206,7 @@ class AppointmentDetail(APIView):
     """
     Retrieve, update or delete a Procedure instance.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -231,7 +241,7 @@ class SpecialistFreeTimeGET(APIView):
     Show specialist free time in direct day.
     example: http://127.0.0.1:8000/api/v1/scheduling/spec_free_time/?daytime=2022-07-06&id=45
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         data = dict(id=request.GET.get('id'), daytime=request.GET.get('daytime'), intervals=[])
         serializer = SpecialistFreeTimeSerializer(data=data)
@@ -245,7 +255,7 @@ class FreeSpecialists(APIView):
     Show free specialist in direct datetime.
     example: http://127.0.0.1:8000/api/v1/scheduling/free_specs/?id=1&datetime=06-07-2022 11:10
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         data = dict(id=request.GET.get('id'), datetime=request.GET.get('datetime'), specialists=[])
         serializer = FreeSpecialistsSerializer(data=data)

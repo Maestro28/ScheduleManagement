@@ -1,12 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAdminUser
+
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from .serializers import UserSerializer, SpecializationSerializer, UserListBySpec
 from .models.specialization_model import Specialization
 from .models.user_model import CustomUser
+
+from .permissions import IsAdmOrIsOwnerOrReadOnly, SpecialistsOnlyPermission, SpecialistOrAdminPermission
 
 # Create your views here.
 
@@ -15,7 +19,7 @@ class UserCreateList(APIView):
     """
     List all users, or create a new User.
     """
-    # permission_classes = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get(self, request, format=None):
         user = CustomUser.objects.all()
@@ -37,7 +41,7 @@ class UserDetail(APIView):
     """
     Retrieve, update or delete a User instance.
     """
-    # permission_classes = [IsAdmOrIsOwnerOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -65,7 +69,7 @@ class UserDetail(APIView):
 
 
 class UserByMailDetail(UserDetail):
-
+    permission_clsses = [AllowAny]
     def get(self, request, email, format=None):
         # user = self.get_object(pk=2)
         user = get_object_or_404(CustomUser, email=email)
@@ -77,7 +81,7 @@ class SpecializationCreateList(APIView):
     """
     List all specializations, or create a new Specialization.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [SpecialistOrAdminPermission]
 
     def get(self, request, format=None):
         spec = Specialization.objects.all()
@@ -101,7 +105,7 @@ class SpecializationDetail(APIView):
     """
     Retrieve, update or delete a Specialization instance.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmOrIsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -135,7 +139,7 @@ class Specialists(SpecializationDetail):
     """
     Show specialists links.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get(self, request, name, format=None):
         spec = get_object_or_404(Specialization, name=name)
@@ -150,7 +154,7 @@ class SpecialistsInfo(APIView):
     """
     Show information about specialization and specialists contacts.
     """
-    # permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_object(self, pk):
         try:
