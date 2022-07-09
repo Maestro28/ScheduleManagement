@@ -238,11 +238,15 @@ class AppointmentDetail(APIView):
 
 class SpecialistFreeTimeGET(APIView):
     """
-    Show specialist free time in direct day.
+    Show specialist free time intervals in direct day.
+    :param id dspecialist identifier
+    :param daytime direct day
     example: http://127.0.0.1:8000/api/v1/scheduling/spec_free_time/?daytime=2022-07-06&id=45
     """
     permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
+        if 'daytime' not in request.GET:
+            return Response({'Empty input error': 'U need to add "daytime" param'}, status=status.HTTP_400_BAD_REQUEST)
         data = dict(id=request.GET.get('id'), daytime=request.GET.get('daytime'), intervals=[])
         serializer = SpecialistFreeTimeSerializer(data=data)
         if serializer.is_valid():
@@ -253,10 +257,14 @@ class SpecialistFreeTimeGET(APIView):
 class FreeSpecialists(APIView):
     """
     Show free specialist in direct datetime.
+    :param id procedure identifier
+    :param datetime direct date and time
     example: http://127.0.0.1:8000/api/v1/scheduling/free_specs/?id=1&datetime=06-07-2022 11:10
     """
     permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
+        if 'datetime' not in request.GET:
+            return Response({'Empty input error': "U need to add 'datetime' param"}, status=status.HTTP_400_BAD_REQUEST)
         data = dict(id=request.GET.get('id'), datetime=request.GET.get('datetime'), specialists=[])
         serializer = FreeSpecialistsSerializer(data=data)
         if serializer.is_valid():
@@ -272,6 +280,8 @@ class ListCustomers(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        if 'daytime' not in request.GET:
+            return Response({'Empty input error': 'U need to add "daytime" param'}, status=status.HTTP_400_BAD_REQUEST)
         data = dict(id=request.user.id, daytime=request.GET.get('daytime'), customers=[])
         serializer = CustomersListSerializer(data=data)
         if serializer.is_valid():
