@@ -6,6 +6,8 @@ from rest_framework import serializers
 from django.core import serializers as SSS
 
 from accounting.models.user_model import CustomUser
+from accounting.models.specialization_model import Specialization
+
 from accounting.serializers import UserSerializer
 
 from .models.schedule_model import Schedule
@@ -164,10 +166,12 @@ class FreeSpecialistsSerializer(serializers.Serializer):
         Check for free intervals which specialist have.
         """
 
-        # I will use selectRelated/prefetch_related instead next few lines to decrease db request amount...
-        procedure = Procedure.objects.get(pk=data['id'])
+        # procedure = Procedure.objects.get(pk=data['id'])
+        procedure = Procedure.objects.select_related('spec').get(pk=data['id'])
         spec = procedure.spec
         users = CustomUser.objects.filter(specs=spec)
+
+        # print(f'\n\n users={users}\n\nusers1={users1}\n\n')
 
         for user in users:
             for interval in free_time_intervals(data['datetime'], user.id):
@@ -180,3 +184,38 @@ class FreeSpecialistsSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['id', 'datetime', 'specialists']
+
+
+class CustomersListSerializer(serializers.Serializer):
+    """
+    This class represents a serializer which designed for show all customers for authorised specialist in direct day.
+    """
+    id = serializers.IntegerField()
+    daytime = serializers.DateTimeField(
+        required=True, allow_null=True,
+        format="%d-%m-%Y",
+        input_formats=["%Y-%m-%d", "%d-%m-%Y"]
+    )
+    customers = UserSerializer(many=True)
+
+    def validate(self, data):
+        """
+        Check for list of customers by selected day appointments list.
+        """
+        print(f'\n\n data = {data}\n\n')
+        appointments = Appointment.objects.select_related('customer').filter(
+            start_datetime__day=data['daytime'].day,
+            start_datetime__month=data['daytime'].month,
+            start_datetime__year=data['daytime'].year,
+            specialist__id=data['id']
+        )
+        print(f'\n\n appointments = {appointments}\n\n')
+
+        for appointment in appointments:
+            if appointment.customer not in data['customers']:
+                data['customers'].append(appointment.customer)
+
+        return data
+
+    class Meta:
+        fields = ['id', 'daytime', 'customers']

@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+
 from django.http import Http404
 
 from accounting.models.user_model import CustomUser
@@ -11,7 +13,7 @@ from .models.procedure_model import Procedure
 from .models.appointment_model import Appointment
 
 from .serializers import ScheduleSerializer, LocationSerializer, ProcedureSerializer, AppointmentSerializer, \
-    SpecialistFreeTimeSerializer, FreeSpecialistsSerializer
+    SpecialistFreeTimeSerializer, FreeSpecialistsSerializer, CustomersListSerializer
 
 # Create your views here.
 
@@ -247,6 +249,21 @@ class FreeSpecialists(APIView):
     def get(self, request, format=None):
         data = dict(id=request.GET.get('id'), datetime=request.GET.get('datetime'), specialists=[])
         serializer = FreeSpecialistsSerializer(data=data)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ListCustomers(APIView):
+    """
+    Show list customers in direct day for authorized specialist.
+    example: http://127.0.0.1:8000/api/v1/scheduling/free_specs/?id=1&datetime=06-07-2022 11:10
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        data = dict(id=request.user.id, daytime=request.GET.get('daytime'), customers=[])
+        serializer = CustomersListSerializer(data=data)
         if serializer.is_valid():
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,7 @@
 from django.urls import path, include, re_path
 
 from .views import ScheduleCreateList, ScheduleDetail, LocationCreateList, LocationDetail, ProcedureCreateList, \
-    ProcedureDetail, AppointmentCreateList, AppointmentDetail, SpecialistFreeTimeGET,FreeSpecialists
+    ProcedureDetail, AppointmentCreateList, AppointmentDetail, SpecialistFreeTimeGET, FreeSpecialists, ListCustomers
 
 app_name = 'scheduling'
 urlpatterns = [
@@ -18,7 +18,8 @@ urlpatterns = [
     path('appointment/create/', AppointmentCreateList.as_view(), name='appointment_create'),
     path('appointment/<int:pk>/', AppointmentDetail.as_view(), name='appointment_detail'),
 
-    path('spec_free_time/', SpecialistFreeTimeGET.as_view(), name='free_specialist_time'),
-    path('free_specs/', FreeSpecialists.as_view(), name='free_specialist_time'),
+    path('spec_free_time/', SpecialistFreeTimeGET.as_view(), name='specialist_free_time'),
+    path('free_specs/', FreeSpecialists.as_view(), name='free_specialist'),
+    path('customers_list/', ListCustomers.as_view(), name='list_customers'),
 
 ]
