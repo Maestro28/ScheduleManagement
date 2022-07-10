@@ -277,7 +277,7 @@ class ListCustomers(APIView):
     Show list customers in direct day for authorized specialist.
     example: http://127.0.0.1:8000/api/v1/scheduling/free_specs/?id=1&datetime=06-07-2022 11:10
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [SpecialistOrAdminPermission]
 
     def get(self, request, format=None):
         if 'daytime' not in request.GET:
