@@ -166,12 +166,8 @@ class FreeSpecialistsSerializer(serializers.Serializer):
         Check for free intervals which specialist have.
         """
 
-        # procedure = Procedure.objects.get(pk=data['id'])
-        procedure = Procedure.objects.select_related('spec').get(pk=data['id'])
-        spec = procedure.spec
-        users = CustomUser.objects.filter(specs=spec)
-
-        # print(f'\n\n users={users}\n\nusers1={users1}\n\n')
+        procedure = Procedure.objects.get(pk=data['id'])
+        users = CustomUser.objects.filter(specs__procedures__id=data['id'])
 
         for user in users:
             for interval in free_time_intervals(data['datetime'], user.id):
@@ -202,14 +198,13 @@ class CustomersListSerializer(serializers.Serializer):
         """
         Check for list of customers by selected day appointments list.
         """
-        print(f'\n\n data = {data}\n\n')
+
         appointments = Appointment.objects.select_related('customer').filter(
             start_datetime__day=data['daytime'].day,
             start_datetime__month=data['daytime'].month,
             start_datetime__year=data['daytime'].year,
             specialist__id=data['id']
         )
-        print(f'\n\n appointments = {appointments}\n\n')
 
         for appointment in appointments:
             if appointment.customer not in data['customers']:
